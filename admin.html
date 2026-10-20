@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de administración · Bisuterías Ayka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/jpeg" href="images/logo-ayka.jpeg">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="index.html" class="brand">
+      <img src="images/logo-ayka.jpeg" alt="Bisuterías Ayka" class="brand-logo">
+    </a>
+  </div>
+</header>
+
+<div class="wrap" style="padding-top: 30px; padding-bottom: 60px;">
+
+  <div class="admin-header">
+    <h1 style="margin:0; font-size:1.6rem;">Panel de administración</h1>
+    <div class="admin-usuario">
+      <span id="correo-actual"></span>
+      <span id="rol-actual" class="etiqueta-rol"></span>
+      <button id="cerrar-sesion" class="boton-mini">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <nav class="admin-tabs" id="admin-tabs">
+    <button class="admin-tab activo" data-panel="panel-productos">Productos</button>
+    <button class="admin-tab" data-panel="panel-estadisticas">Estadísticas</button>
+    <button class="admin-tab admin-solo-owner" data-panel="panel-equipo" style="display:none;">Equipo</button>
+  </nav>
+
+  <!-- ---------- PRODUCTOS ---------- -->
+  <section id="panel-productos" class="admin-panel activo">
+
+    <div class="admin-seccion-head">
+      <h2 style="margin:0;">Agregar producto</h2>
+    </div>
+
+    <form id="form-producto" class="formulario-producto">
+      <div>
+        <label for="p-apartado">Apartado</label>
+        <select id="p-apartado" required>
+          <option value="coleccion">Colección</option>
+          <option value="personalizados">Personalizados</option>
+          <option value="decoracion">Decoración</option>
+        </select>
+      </div>
+      <div id="campo-categoria">
+        <label for="p-categoria">Categoría</label>
+        <select id="p-categoria">
+          <option value="aretes">Aretes</option>
+          <option value="collares">Collares</option>
+          <option value="pulseras">Pulseras</option>
+          <option value="anillos">Anillos</option>
+        </select>
+      </div>
+      <div>
+        <label for="p-nombre">Nombre</label>
+        <input type="text" id="p-nombre" required>
+      </div>
+      <div id="campo-precio">
+        <label for="p-precio">Precio ($)</label>
+        <input type="number" id="p-precio" step="0.01" min="0">
+      </div>
+      <div id="campo-stock">
+        <label for="p-stock">Stock (cantidad)</label>
+        <input type="number" id="p-stock" step="1" min="0" value="1">
+      </div>
+      <div class="campo-ancho" id="campo-descripcion" style="display:none;">
+        <label for="p-descripcion">Descripción</label>
+        <textarea id="p-descripcion" rows="2"></textarea>
+      </div>
+      <div class="campo-ancho">
+        <label for="p-foto">Foto</label>
+        <input type="file" id="p-foto" accept="image/*" required>
+      </div>
+      <div class="campo-ancho">
+        <p id="mensaje-producto" class="mensaje-error" role="alert"></p>
+        <button type="submit" class="btn btn-primario" id="btn-guardar-producto">Guardar producto</button>
+      </div>
+    </form>
+
+    <h2>Productos existentes</h2>
+    <div class="filtros" id="filtro-apartado" style="margin-bottom:16px;">
+      <button class="filtro activo" data-apartado="todos">Todos</button>
+      <button class="filtro" data-apartado="coleccion">Colección</button>
+      <button class="filtro" data-apartado="personalizados">Personalizados</button>
+      <button class="filtro" data-apartado="decoracion">Decoración</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="tabla-admin" id="tabla-productos">
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Nombre</th>
+            <th>Apartado</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Cotizados</th>
+            <th>Vendidos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla-productos"></tbody>
+      </table>
+    </div>
+
+    <div id="barra-cambios" class="barra-cambios">
+      <span id="texto-cambios">Tienes cambios sin guardar</span>
+      <div class="fila-acciones">
+        <button id="cancelar-cambios" class="btn-secundario">Cancelar</button>
+        <button id="guardar-cambios" class="btn btn-primario">Guardar cambios</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ESTADÍSTICAS ---------- -->
+  <section id="panel-estadisticas" class="admin-panel">
+    <h2>Resumen general</h2>
+    <div class="tarjetas-estadisticas">
+      <div class="tarjeta-estadistica">
+        <span class="numero" id="total-cotizados">0</span>
+        <span class="etiqueta">Total cotizados</span>
+      </div>
+      <div class="tarjeta-estadistica">
+        <span class="numero" id="total-vendidos">0</span>
+        <span class="etiqueta">Total vendidos</span>
+      </div>
+      <div class="tarjeta-estadistica">
+        <span class="numero" id="total-productos">0</span>
+        <span class="etiqueta">Productos publicados</span>
+      </div>
+    </div>
+
+    <h2>Por producto</h2>
+    <div style="overflow-x:auto;">
+      <table class="tabla-admin" id="tabla-estadisticas">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cotizados</th>
+            <th>Vendidos</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla-estadisticas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---------- EQUIPO (solo Owner) ---------- -->
+  <section id="panel-equipo" class="admin-panel">
+    <h2>Agregar administrador</h2>
+    <p style="max-width:500px;">Crea la cuenta de acceso para otra persona. Ella iniciará sesión con este mismo correo y la contraseña que definas aquí.</p>
+
+    <form id="form-admin" class="formulario-producto">
+      <div>
+        <label for="a-correo">Correo del nuevo administrador</label>
+        <input type="email" id="a-correo" required>
+      </div>
+      <div>
+        <label for="a-contrasena">Contraseña temporal</label>
+        <input type="text" id="a-contrasena" required minlength="6">
+      </div>
+      <div class="campo-ancho">
+        <p id="mensaje-admin" class="mensaje-error" role="alert"></p>
+        <button type="submit" class="btn btn-primario">Crear cuenta de administrador</button>
+      </div>
+    </form>
+
+    <h2>Equipo actual</h2>
+    <div style="overflow-x:auto;">
+      <table class="tabla-admin" id="tabla-equipo">
+        <thead>
+          <tr>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla-equipo"></tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<div id="modal-confirmar" class="modal-confirmar">
+  <div class="modal-confirmar-caja">
+    <p id="modal-confirmar-texto">¿Confirmas esta acción?</p>
+    <div class="modal-confirmar-botones">
+      <button id="modal-confirmar-cancelar" class="btn-secundario" type="button">Cancelar</button>
+      <button id="modal-confirmar-aceptar" class="btn btn-primario" type="button">Sí, confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi cuenta · Bisuterías Ayka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/jpeg" href="images/logo-ayka.jpeg">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<a class="saltar-contenido" href="#contenido">Saltar al contenido</a>
+<div id="anuncios" class="solo-lectores" role="status" aria-live="polite"></div>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="index.html" class="brand">
+      <img src="images/logo-ayka.jpeg" alt="Bisuterías Ayka" class="brand-logo">
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Volver a la tienda</a>
+    </nav>
+    <button id="cerrar-sesion" class="boton-mini" type="button">Cerrar sesión</button>
+  </div>
+</header>
+
+<main id="contenido" class="wrap" style="padding-top: 30px; padding-bottom: 60px;">
+
+  <h1 style="margin-bottom: 26px;">Mi cuenta</h1>
+
+  <nav class="admin-tabs" aria-label="Secciones de mi cuenta">
+    <button class="admin-tab activo" type="button" data-panel="panel-datos" aria-pressed="true">Mis datos</button>
+    <button class="admin-tab" type="button" data-panel="panel-favoritos" aria-pressed="false">Favoritos</button>
+    <button class="admin-tab" type="button" data-panel="panel-pedidos" aria-pressed="false">Mis pedidos</button>
+  </nav>
+
+  <section id="panel-datos" class="admin-panel activo">
+    <form id="form-datos" class="formulario-producto" style="max-width: 420px;">
+      <div class="campo-ancho">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" required>
+      </div>
+      <div class="campo-ancho">
+        <label for="telefono">Teléfono / WhatsApp</label>
+        <input type="tel" id="telefono" required>
+      </div>
+      <div class="campo-ancho">
+        <p id="mensaje-datos" class="mensaje-error" role="alert"></p>
+        <button type="submit" class="btn btn-primario">Guardar cambios</button>
+      </div>
+    </form>
+
+    <div class="zona-datos">
+      <h2>Tus datos personales</h2>
+      <p>Puedes descargar una copia de todo lo que guardamos de ti, o eliminar tu cuenta por completo.</p>
+      <button type="button" id="descargar-datos" class="btn-secundario" style="max-width:320px;">Descargar mis datos</button>
+    </div>
+
+    <div class="zona-peligro">
+      <h3>Eliminar mi cuenta</h3>
+      <p>Se borrarán tu perfil, favoritos, carrito e historial de pedidos. <strong>Esta acción no se puede deshacer.</strong> Por seguridad, escribe tu contraseña para confirmar.</p>
+      <form id="form-eliminar" class="form-auth">
+        <label for="contrasena-eliminar">Tu contraseña</label>
+        <input type="password" id="contrasena-eliminar" autocomplete="current-password" required>
+        <p id="mensaje-eliminar" class="mensaje-error" role="alert"></p>
+        <button type="submit" class="boton-peligro">Eliminar mi cuenta definitivamente</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="panel-favoritos" class="admin-panel">
+    <div class="grid-galeria" id="grid-favoritos"></div>
+  </section>
+
+  <section id="panel-pedidos" class="admin-panel">
+    <div id="lista-pedidos"></div>
+  </section>
+
+</main>
+
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Foto ampliada">
+  <button id="cerrar-lightbox" class="cerrar-lightbox" type="button" aria-label="Cerrar foto ampliada">×</button>
+  <img id="lightbox-imagen" src="" alt="">
+</div>
+
+<script type="module" src="mi-cuenta.js"></script>
+</body>
+</html>

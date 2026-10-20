@@ -1,0 +1,396 @@
+/* =====================================================================
+   MEJORAS VISUALES Y ANIMACIONES  —  se carga DESPUÉS de style.css
+   ---------------------------------------------------------------------
+   Reglas que sigo en todo este archivo:
+   · Solo se animan "transform" y "opacity" (no frenan el celular).
+   · Los efectos de "hover" solo existen en dispositivos con cursor.
+   · Si la persona pidió menos movimiento, no hay animaciones (WCAG 2.3.3).
+   · Ninguna animación decorativa dura más de 5 segundos (WCAG 2.2.2).
+   · Las animaciones de entrada usan "backwards": al terminar, el elemento
+     vuelve a su estilo normal y el hover sigue funcionando.
+   ===================================================================== */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sombra-suave: 0 1px 2px rgba(43, 36, 32, 0.05), 0 6px 18px rgba(43, 36, 32, 0.06);
+  --sombra-media: 0 2px 4px rgba(43, 36, 32, 0.06), 0 16px 36px rgba(43, 36, 32, 0.13);
+  --sombra-dorada: 0 18px 38px -14px rgba(133, 97, 31, 0.5);
+  --radio: 16px;
+  --margen-lateral: clamp(18px, 4vw, 32px);
+}
+
+/* ---------- Base: tipografía y ritmo ---------- */
+html { scrollbar-gutter: stable; }
+body { overflow-x: clip; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.005em; }
+p { text-wrap: pretty; }
+::selection { background: var(--color-acento-suave); color: var(--color-text); }
+
+/* Evita que se pueda hacer scroll de la página detrás de una ventana abierta */
+body:has(.checkout.visible),
+body:has(.panel-carrito.visible),
+body:has(.lightbox.visible) { overflow: hidden; }
+.checkout-caja, .lista-carrito { overscroll-behavior: contain; }
+
+/* ---------- Corrección de márgenes (el título y las tarjetas pegaban al borde) ---------- */
+.wrap { padding-inline: var(--margen-lateral); }
+.catalogo.wrap, .galeria.wrap { padding-inline: var(--margen-lateral); }
+.catalogo { padding-block: clamp(56px, 9vw, 96px); }
+.galeria { padding-block: clamp(48px, 8vw, 84px); }
+
+/* Secciones estáticas: el navegador no las dibuja hasta que se acercan (carga más rápida) */
+.nosotros, .contacto, .site-footer { content-visibility: auto; contain-intrinsic-size: auto 340px; }
+
+/* ---------- Cabecera y navegación ---------- */
+.site-header { border-bottom-color: rgba(222, 210, 194, 0.75); }
+.brand-logo { box-shadow: var(--sombra-suave); transition: transform 0.6s var(--ease-spring), box-shadow 0.4s ease; }
+.main-nav a { position: relative; padding: 6px 2px; transition: color 0.25s ease; }
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: var(--color-acento);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.main-nav a[aria-current="true"] { color: var(--color-text); }
+.main-nav a[aria-current="true"]::after { transform: scaleX(1); }
+
+.boton-carrito { transition: transform 0.3s var(--ease-spring), color 0.2s ease; }
+.boton-carrito:active { transform: scale(0.92); }
+.contador-carrito { transition: background 0.2s ease; }
+.contador-carrito.rebote { animation: rebote 0.55s var(--ease-spring); }
+.enlace-cuenta { position: relative; transition: color 0.2s ease; }
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(72px, 12vw, 132px) 0 clamp(64px, 10vw, 112px);
+}
+.hero::before, .hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero::before {
+  width: min(70vw, 420px);
+  aspect-ratio: 1;
+  left: -12%;
+  top: -22%;
+  background: radial-gradient(circle, rgba(228, 211, 182, 0.95), rgba(228, 211, 182, 0) 68%);
+}
+.hero::after {
+  width: min(80vw, 480px);
+  aspect-ratio: 1;
+  right: -16%;
+  bottom: -34%;
+  background: radial-gradient(circle, rgba(133, 97, 31, 0.26), rgba(133, 97, 31, 0) 68%);
+}
+.hero h1 { font-size: clamp(2.5rem, 7.2vw, 4.3rem); line-height: 1.07; letter-spacing: -0.012em; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-weight: 500; }
+.hero-eyebrow::before, .hero-eyebrow::after { content: ""; width: 26px; height: 1px; background: currentColor; opacity: 0.55; }
+.hero-copy { max-width: 46ch; margin-inline: auto; }
+
+/* ---------- Botones ---------- */
+.btn, .btn-secundario { border-radius: 10px; }
+.btn {
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+.btn-primario { position: relative; overflow: hidden; box-shadow: 0 8px 18px -8px rgba(43, 36, 32, 0.55); }
+.btn-primario::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.3) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.btn:active:not(:disabled), .btn-secundario:active:not(:disabled) { transform: scale(0.97); }
+.btn-secundario { transition: transform 0.25s var(--ease-out), background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+.btn-agregar.agregado { background: var(--color-text); border-color: var(--color-text); color: var(--color-bg); }
+.btn-agregar.agregado::after { content: " ✓"; }
+
+/* ---------- Filtros ---------- */
+.filtro { transition: transform 0.3s var(--ease-out), background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+.filtro:active { transform: scale(0.94); }
+.filtro.activo { box-shadow: 0 10px 18px -10px rgba(43, 36, 32, 0.6); }
+
+/* ---------- Títulos de sección con detalle dorado ---------- */
+.catalogo-head h2, .galeria-head h2, .nosotros-inner h2, .contacto-inner h2 { font-size: clamp(1.75rem, 4.2vw, 2.4rem); }
+.catalogo-head h2::after, .galeria-head h2::after {
+  content: "";
+  display: block;
+  width: 46px;
+  height: 2px;
+  margin-top: 12px;
+  background: var(--color-acento);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s var(--ease-out) 0.3s;
+}
+.rv-visible h2::after, .rv-hecho h2::after { transform: scaleX(1); }
+
+/* ---------- Tarjetas de producto ---------- */
+.grid-productos, .grid-galeria {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 232px), 1fr));
+  gap: clamp(14px, 2.4vw, 30px);
+}
+.tarjeta-producto, .tarjeta-galeria {
+  border-radius: var(--radio);
+  border-color: rgba(222, 210, 194, 0.9);
+  box-shadow: var(--sombra-suave);
+  transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out), border-color 0.3s ease;
+}
+.tarjeta-imagen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(43, 36, 32, 0.3), transparent 48%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.tarjeta-imagen img { transition: transform 0.9s var(--ease-out); }
+.tarjeta-imagen img:focus-visible { outline-offset: -4px; }
+.boton-favorito, .etiqueta-agotado { z-index: 2; }
+.boton-favorito { transition: transform 0.3s var(--ease-spring), background 0.2s ease, color 0.2s ease; }
+.boton-favorito:active { transform: scale(0.85); }
+.boton-favorito.latido { animation: latido 0.55s var(--ease-spring); }
+.tarjeta-info { display: flex; flex-direction: column; gap: 8px; padding: 16px 16px 18px; }
+.tarjeta-info > * { margin: 0; }
+.tarjeta-info h3 { font-size: 1.12rem; line-height: 1.25; }
+.tarjeta-precio { font-family: var(--fuente-display); font-size: 1.4rem; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+.tarjeta-galeria .tarjeta-info p { font-size: 0.88rem; }
+
+/* Cargando */
+.cargando[role="status"]::after {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 34px;
+  margin: 14px auto 0;
+  border-radius: 50%;
+  border: 3px solid var(--color-linea);
+  border-top-color: var(--color-acento);
+  animation: girar 0.8s linear infinite;
+}
+
+/* ---------- Sobre nosotros, contacto, pie ---------- */
+.nosotros-inner p {
+  font-family: var(--fuente-display);
+  font-size: clamp(1.25rem, 2.7vw, 1.6rem);
+  line-height: 1.55;
+  color: var(--color-text);
+}
+.site-footer { background: var(--color-bg-alt); border-top: none; padding: 36px 0; }
+
+/* ---------- WhatsApp flotante ---------- */
+.whatsapp-flotante { transition: transform 0.35s var(--ease-spring), box-shadow 0.3s ease; }
+.whatsapp-flotante:active { transform: scale(0.92); }
+.whatsapp-flotante::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-whatsapp);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Carrito ---------- */
+.fondo-carrito { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.panel-carrito { border-left: none; border-radius: 22px 0 0 22px; box-shadow: -24px 0 60px rgba(43, 36, 32, 0.2); }
+.item-carrito-cantidad button { border-radius: 50%; transition: transform 0.2s var(--ease-spring), border-color 0.2s ease, color 0.2s ease; }
+.item-carrito-cantidad button:active { transform: scale(0.82); }
+.item-carrito-quitar { transition: transform 0.25s var(--ease-out), color 0.2s ease; }
+.item-carrito-quitar:active { transform: scale(0.8); }
+.carrito-total span:last-child.pulso { animation: pulso 0.6s var(--ease-out); }
+.carrito-total span:last-child { display: inline-block; }
+.carrito-vacio { padding: 28px 0; }
+
+/* ---------- Checkout (pago) ---------- */
+.checkout-cuerpo > section:not([hidden]) { animation: entrar-vista 0.45s var(--ease-out) backwards; }
+.checkout-cuerpo > section:not([hidden]) .pasos-pago li { animation: entrar-vista 0.5s var(--ease-out) backwards; }
+.pasos-pago li:nth-child(1) { animation-delay: 0.18s; }
+.pasos-pago li:nth-child(2) { animation-delay: 0.28s; }
+.pasos-pago li:nth-child(3) { animation-delay: 0.38s; }
+.opcion-pago input:checked ~ .opcion-pago-check { animation: pop 0.45s var(--ease-spring); }
+.opcion-pago:active { transform: scale(0.985); }
+.chip-banco-cuerpo { transition: transform 0.25s var(--ease-out), background 0.25s ease, color 0.25s ease, border-color 0.25s ease; }
+.chip-banco:active .chip-banco-cuerpo { transform: scale(0.95); }
+.cuenta-bancaria { animation: voltear-entrada 0.65s var(--ease-out) backwards; }
+.tarjeta-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.24) 50%, transparent 70%);
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+.boton-copiar { transition: transform 0.2s var(--ease-spring), background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+.boton-copiar:active { transform: scale(0.92); }
+.boton-copiar.copiado, .boton-copiar-claro.copiado { background: #E3F1E8; border-color: #256A42; color: #1B5133; }
+.referencia-caja { transition: background 0.3s ease; }
+
+/* ---------- Pantallas de acceso, páginas legales y panel ---------- */
+.tarjeta-auth { animation: subir 0.8s var(--ease-out) backwards; }
+.pagina-legal { animation: subir 0.7s var(--ease-out) backwards; }
+.form-auth input, .form-auth select, .formulario-producto input, .formulario-producto select, .formulario-producto textarea {
+  transition: border-color 0.2s ease, box-shadow 0.25s ease;
+}
+.form-auth input:focus, .form-auth select:focus, .formulario-producto input:focus, .formulario-producto select:focus, .formulario-producto textarea:focus {
+  outline: none;
+  border-color: var(--color-acento);
+  box-shadow: 0 0 0 4px rgba(133, 97, 31, 0.16);
+}
+.admin-tab { transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s var(--ease-out); }
+.admin-tab:active { transform: scale(0.96); }
+.admin-panel.activo { animation: entrar-vista 0.4s var(--ease-out) backwards; }
+.tabla-admin tbody tr { transition: background 0.2s ease; }
+.tabla-admin tbody tr:hover { background: var(--color-bg-alt); }
+.tarjeta-estadistica { transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out); }
+.boton-mini { transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease-out); }
+.boton-mini:active { transform: scale(0.94); }
+.aviso-cookies { animation: subir 0.7s var(--ease-out) 0.9s backwards; }
+.aviso-cookies button { transition: transform 0.2s var(--ease-out); }
+.aviso-cookies button:active { transform: scale(0.95); }
+
+/* ---------- Aparición al hacer scroll (la activa animaciones.js) ---------- */
+.rv {
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  transition: opacity 0.85s var(--ease-out) var(--rv-delay, 0ms), transform 0.85s var(--ease-out) var(--rv-delay, 0ms);
+}
+.rv.rv-visible { opacity: 1; transform: none; }
+
+/* =====================================================================
+   SOLO EN DISPOSITIVOS CON CURSOR (en el celular no existe "hover")
+   ===================================================================== */
+@media (hover: hover) {
+  .brand:hover .brand-logo { transform: scale(1.04) rotate(-1.5deg); box-shadow: var(--sombra-media); }
+  .main-nav a:hover::after { transform: scaleX(1); }
+  .boton-carrito:hover { transform: translateY(-2px) scale(1.07); }
+  .btn-primario:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--sombra-dorada); }
+  .btn-primario:hover::after { transform: translateX(120%); transition: transform 0.85s var(--ease-out); }
+  .btn-secundario:hover:not(:disabled) { transform: translateY(-1px); background: var(--color-bg-alt); }
+  .filtro:hover { transform: translateY(-2px); }
+  .tarjeta-producto:hover, .tarjeta-galeria:hover { transform: translateY(-6px); box-shadow: var(--sombra-media); border-color: var(--color-acento-suave); }
+  .tarjeta-producto:hover .tarjeta-imagen::after, .tarjeta-galeria:hover .tarjeta-imagen::after { opacity: 1; }
+  .tarjeta-producto:hover .tarjeta-imagen img, .tarjeta-galeria:hover .tarjeta-imagen img { transform: scale(1.07); }
+  .boton-favorito:hover { transform: scale(1.12); }
+  .whatsapp-flotante:hover { transform: translateY(-3px) scale(1.06); box-shadow: 0 10px 24px rgba(31, 122, 58, 0.45); }
+  .item-carrito-cantidad button:hover { transform: scale(1.1); }
+  .item-carrito-quitar:hover { transform: rotate(90deg); }
+  .tarjeta-estadistica:hover { transform: translateY(-4px); box-shadow: var(--sombra-media); }
+  .boton-copiar:hover { transform: translateY(-1px); }
+}
+
+/* =====================================================================
+   MOVIMIENTO (solo si la persona NO pidió reducirlo)
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  /* Entrada del hero, una pieza detrás de otra */
+  .hero-inner > * { animation: subir 0.95s var(--ease-out) backwards; }
+  .hero-inner > :nth-child(1) { animation-delay: 0.05s; }
+  .hero-inner > :nth-child(2) { animation-delay: 0.2s; }
+  .hero-inner > :nth-child(3) { animation-delay: 0.36s; }
+  .hero-inner > :nth-child(4) { animation-delay: 0.52s; }
+  /* Los destellos de fondo se acomodan una sola vez (4 s) */
+  .hero::before { animation: deriva-a 4s var(--ease-out) backwards; }
+  .hero::after { animation: deriva-b 4s var(--ease-out) backwards; }
+
+  /* Brillo que cruza la tarjeta de pago, una sola vez */
+  .tarjeta-visual::after { animation: brillo 1.6s ease-out 0.5s 1 backwards; }
+
+  /* Aro del botón de WhatsApp: 2 pulsos para llamar la atención y se detiene */
+  .whatsapp-flotante::after { animation: aro 1.8s ease-out 1.5s 2 backwards; }
+
+  /* Filas del carrito: entran solo cuando se abre el panel (no en cada cambio de cantidad) */
+  .panel-carrito.entrando .item-carrito { animation: entrar-lista 0.5s var(--ease-out) backwards; }
+  .panel-carrito.entrando .item-carrito:nth-child(2) { animation-delay: 0.07s; }
+  .panel-carrito.entrando .item-carrito:nth-child(3) { animation-delay: 0.14s; }
+  .panel-carrito.entrando .item-carrito:nth-child(n + 4) { animation-delay: 0.2s; }
+
+  /* Barra de progreso de lectura (solo navegadores que la soportan) */
+  @supports (animation-timeline: scroll()) {
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      z-index: 70;
+      background: linear-gradient(90deg, var(--color-acento-suave), var(--color-acento));
+      transform: scaleX(0);
+      transform-origin: left;
+      pointer-events: none;
+      animation: progreso linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Si la persona pidió menos movimiento: sin aparición ni repeticiones */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-iteration-count: 1 !important; }
+  .rv { opacity: 1 !important; transform: none !important; }
+}
+
+/* Al imprimir, todo visible */
+@media print {
+  .rv { opacity: 1 !important; transform: none !important; }
+  body::before, .aviso-cookies, .whatsapp-flotante { display: none !important; }
+}
+
+/* =====================================================================
+   CELULAR (diseño pensado primero para pantallas pequeñas)
+   ===================================================================== */
+@media (max-width: 599px) {
+  .panel-carrito { border-radius: 0; }
+  .hero-copy { font-size: 1rem; }
+  .catalogo-head { gap: 14px; }
+  .filtros { gap: 8px; }
+  .filtro { padding: 9px 16px; min-height: 40px; }
+}
+/* Dos columnas en celular: se ve más como tienda y se recorre más rápido */
+@media (min-width: 360px) and (max-width: 599px) {
+  .grid-productos, .grid-galeria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tarjeta-info { padding: 12px 12px 14px; gap: 6px; }
+  .tarjeta-info h3 { font-size: 1rem; }
+  .tarjeta-precio { font-size: 1.25rem; }
+  .tarjeta-info .btn-secundario { padding: 10px 6px; font-size: 0.8rem; }
+  .tarjeta-galeria .tarjeta-info p { font-size: 0.8rem; }
+}
+
+/* =====================================================================
+   ANIMACIONES (definiciones)
+   ===================================================================== */
+@keyframes subir { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes entrar-vista { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+@keyframes entrar-lista { from { opacity: 0; transform: translateX(22px); } to { opacity: 1; transform: none; } }
+@keyframes voltear-entrada {
+  from { opacity: 0; transform: perspective(900px) rotateX(-14deg) translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop { 0% { transform: scale(0.5); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes rebote { 0% { transform: scale(1); } 35% { transform: scale(1.6); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
+@keyframes latido { 0% { transform: scale(1); } 30% { transform: scale(1.35); } 55% { transform: scale(0.92); } 100% { transform: scale(1); } }
+@keyframes pulso { 0% { transform: scale(1); } 40% { transform: scale(1.14); color: var(--color-acento); } 100% { transform: scale(1); } }
+@keyframes girar { to { transform: rotate(360deg); } }
+@keyframes brillo { from { transform: translateX(-110%); } to { transform: translateX(110%); } }
+@keyframes aro { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.7); } }
+@keyframes deriva-a { from { opacity: 0; transform: translate(-40px, 30px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes deriva-b { from { opacity: 0; transform: translate(40px, -30px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes progreso { to { transform: scaleX(1); } }
