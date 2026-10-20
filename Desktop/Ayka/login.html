@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acceso administradores · Bisuterías Ayka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/jpeg" href="images/logo-ayka.jpeg">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+<main class="pantalla-auth">
+  <div class="tarjeta-auth">
+    <a href="index.html" class="brand" style="justify-content:center; margin-bottom: 20px;">
+      <img src="images/logo-ayka.jpeg" alt="Bisuterías Ayka" class="brand-logo">
+    </a>
+    <h1>Acceso administradores</h1>
+    <p class="auth-subtitulo">Inicia sesión con tu correo y contraseña.</p>
+
+    <form id="form-login" class="form-auth">
+      <label for="correo">Correo electrónico</label>
+      <input type="email" id="correo" name="correo" required autocomplete="email">
+
+      <label for="contrasena">Contraseña</label>
+      <input type="password" id="contrasena" name="contrasena" required autocomplete="current-password">
+
+      <p id="mensaje-error" class="mensaje-error" role="alert"></p>
+
+      <button type="submit" class="btn btn-primario btn-ancho">Iniciar sesión</button>
+    </form>
+
+    <a href="index.html" class="volver-inicio">← Volver a la tienda</a>
+  </div>
+</main>
+
+<script type="module" src="login.js"></script>
+</body>
+</html>

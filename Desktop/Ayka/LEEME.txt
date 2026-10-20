@@ -1,0 +1,239 @@
+BISUTERÍAS AYKA - Sitio web
+============================
+
+CÓMO ABRIRLO EN VISUAL STUDIO CODE
+1. Descarga esta carpeta completa ("bisuterias-ayka") a tu computadora.
+2. Abre VS Code > Archivo > Abrir carpeta... > selecciona "bisuterias-ayka".
+3. Instala la extensión "Live Server" (de Ritwick Dey) desde el ícono de
+   extensiones (el cuadradito en la barra lateral izquierda).
+4. Clic derecho sobre index.html > "Open with Live Server".
+   Se abrirá la página en tu navegador y se actualiza sola cada vez que guardas.
+
+CÓMO AGREGAR TUS 50+ FOTOS
+1. Copia todas tus fotos dentro de la carpeta "images".
+2. Abre el archivo "productos.js".
+3. Por cada foto, agrega una línea así (copia una existente y cámbiala):
+
+   { nombre: "Aretes Perla", categoria: "aretes", precio: 8.00, imagen: "aretes-perla.jpg" },
+
+   - nombre: cómo se llama el producto.
+   - categoria: debe ser exactamente una de estas 4 palabras:
+     aretes, collares, pulseras, anillos
+   - precio: el precio en números (usa punto, no coma).
+   - imagen: el nombre EXACTO del archivo de la foto que pusiste en /images
+     (respeta mayúsculas, espacios y extensión .jpg/.png).
+
+No hace falta tocar el HTML ni el CSS: la página arma las tarjetas
+automáticamente a partir de esta lista.
+
+CAMBIAR EL NÚMERO DE WHATSAPP
+Abre "script.js" y edita la primera línea:
+   const TELEFONO = "593996723146";
+
+CAMBIAR COLORES
+Abre "style.css" y edita los valores dentro de ":root" al inicio del archivo
+(por ejemplo --color-acento es el dorado usado en precios y botones).
+
+PUBLICAR LA PÁGINA GRATIS
+La forma más simple es Netlify Drop (https://app.netlify.com/drop):
+arrastras la carpeta completa y te da un link público en segundos.
+
+
+SISTEMA DE CUENTAS Y PANEL DE ADMINISTRACIÓN
+==============================================
+
+ARCHIVOS NUEVOS:
+- firebase-config.js  → conexión a Firebase y Cloudinary (no lo edites)
+- login.html / login.js → pantalla de inicio de sesión
+- admin.html / admin.js → panel de productos, estadísticas y equipo
+- reglas-firestore.txt → reglas de seguridad que debes pegar en Firebase
+
+PASO 1: Pega las reglas de seguridad
+Sigue las instrucciones dentro de "reglas-firestore.txt". Es obligatorio,
+sin esto la base de datos queda desprotegida.
+
+PASO 2: Crea tu propia cuenta Owner (una sola vez, manual)
+Esta primera cuenta no la puede crear el panel (todavía no existe
+ningún Owner que la cree). Se hace así:
+
+  a) Ve a Firebase Console > Authentication > Users > "Add user"
+     Escribe tu correo y una contraseña. Guarda.
+
+  b) Ve a Firebase Console > Firestore Database > Datos (Data)
+     Clic en "Start collection" (Iniciar colección)
+     - ID de la colección: usuarios
+     - ID del documento: tu correo completo, en minúsculas
+       (ej: dueña@gmail.com)
+     - Agrega un campo:
+       nombre del campo: rol
+       tipo: string
+       valor: owner
+     Guarda.
+
+PASO 3: Sube tus productos por primera vez
+Los productos ya NO se agregan editando código. Entra a tu página,
+ve al final (pie de página) > "Acceso administradores", inicia
+sesión con tu cuenta Owner, y usa el formulario "Agregar producto"
+para subir tus productos reales con sus fotos.
+
+Nota: tus productos de ejemplo anteriores (en productos.js,
+personalizados.js, decoracion.js) ya NO se muestran en la página.
+Esos archivos quedaron sin usar — puedes borrarlos si quieres, o
+dejarlos ahí sin problema, no afectan nada.
+
+PASO 4: Agregar administradores
+Una vez dentro del panel como Owner, ve a la pestaña "Equipo" y
+crea la cuenta del nuevo administrador ahí mismo (correo +
+contraseña). Esa persona ya puede iniciar sesión de inmediato en
+"Acceso administradores" con esos datos. Los admins ven las
+pestañas "Productos" y "Estadísticas", pero no "Equipo" (esa es
+solo para el Owner).
+
+SOBRE "COTIZADOS" Y "VENDIDOS":
+- Cotizado: se suma solo, cada vez que alguien hace clic en
+  "Pedir por WhatsApp" o "Finalizar pedido".
+- Vendido: nadie lo sabe automáticamente (la venta se confirma
+  por WhatsApp, fuera de la página). Tú o un admin deben darle
+  clic a "+1 vendido" en la tabla de productos cuando el cliente
+  confirme la compra.
+
+
+CUENTAS DE CLIENTES (usuarios normales, no administradores)
+==============================================================
+
+ARCHIVOS NUEVOS:
+- registro.html / registro.js → un cliente crea su cuenta (nombre, teléfono, correo, contraseña)
+- ingresar.html / ingresar.js → login de clientes (separado del de administradores)
+- mi-cuenta.html / mi-cuenta.js → panel del cliente: sus datos, favoritos y pedidos
+
+QUÉ PUEDE HACER UN CLIENTE CON SU CUENTA:
+- Guardar productos como favoritos (corazón ♡ en cada tarjeta de la Colección)
+- Ver su historial de pedidos anteriores (se guarda automáticamente cada vez
+  que usa "Finalizar pedido por WhatsApp" estando conectado a su cuenta)
+- Guardar su nombre y teléfono una sola vez: a partir de ahí, esos datos se
+  agregan automáticamente al mensaje de WhatsApp en cada pedido
+
+IMPORTANTE: recuerda actualizar las reglas de Firestore con el nuevo bloque
+de "clientes" que está en reglas-firestore.txt (reemplaza todo el archivo
+de reglas en Firebase por el actualizado, no solo agregues el pedazo nuevo).
+
+Este sistema de cuentas de clientes es completamente independiente del de
+administradores: alguien puede tener cuenta de cliente, de administrador,
+ambas, o ninguna.
+
+
+APP INSTALABLE (PWA)
+======================
+
+ARCHIVOS NUEVOS:
+- manifest.json → le dice al navegador cómo se debe ver/comportar la app
+- service-worker.js → permite que abra rápido y se pueda "instalar"
+- images/icon-192.png, images/icon-512.png, images/apple-touch-icon.png
+  → íconos de la app, generados automáticamente a partir de tu logo
+
+CÓMO PROBARLA:
+1. Sube todo a Netlify Drop como siempre (arrastrando la carpeta completa,
+   sin olvidar la carpeta "images" con los íconos nuevos).
+2. Abre el link publicado (bisuteriasayka.netlify.app) desde el CELULAR.
+3. En Android/Chrome: te debería aparecer un aviso de "Agregar a pantalla
+   de inicio" o "Instalar app" (a veces está en el menú de 3 puntos).
+4. En iPhone/Safari: toca el botón de compartir (el cuadrado con flecha
+   hacia arriba) > "Agregar a pantalla de inicio".
+5. Después de instalarla, ábrela desde el ícono — debería abrir SIN la
+   barra de direcciones del navegador, como una app real.
+
+Es exactamente el mismo sitio y la misma base de datos de Firebase, así
+que cualquier producto, pedido o cambio se ve igual en la web y en la
+app instalada — no hay nada que sincronizar aparte.
+
+SIGUIENTE PASO (cuando quieran subirla a Play Store):
+Se usa una herramienta llamada Capacitor para empaquetar esta misma PWA
+como una app de Android/iOS instalable desde las tiendas oficiales.
+Cuando lleguen a ese punto, hay que retomar la conversación para
+configurarlo (requiere instalar Android Studio y crear una cuenta de
+desarrollador de Google Play, entre otras cosas).
+
+
+SUBIR LA APP A GOOGLE PLAY (con Capacitor)
+=============================================
+
+ARCHIVOS NUEVOS:
+- privacidad.html → política de privacidad (obligatoria para Google Play)
+- capacitor.config.json → configuración base de Capacitor
+
+Esta parte requiere instalar Node.js y Android Studio en tu computadora
+(Claude no puede instalarlos ni compilar la app por ti). El resumen:
+
+1. Instala Node.js (nodejs.org) y Android Studio (developer.android.com/studio)
+2. En la terminal, dentro de la carpeta del proyecto:
+   npm init -y
+   npm install @capacitor/core @capacitor/cli
+   npx cap init "Bisuterias Ayka" "com.aykabisuterias.app" --web-dir www
+   npx cap add android
+3. Cada vez que cambies tu sitio:  node copiar-web.mjs  y luego  npx cap copy
+   (copiar-web.mjs deja en la carpeta "www" solo los archivos del sitio)
+4. Para abrir en Android Studio: npx cap open android
+5. En Android Studio: Build > Generate Signed Bundle/APK (.aab)
+   IMPORTANTE: guarda el archivo de la clave de firma y su contraseña en
+   un lugar seguro. Sin eso no podrás subir actualizaciones futuras.
+6. Crea tu cuenta en play.google.com/console ($25 pago único)
+7. Sube el .aab, completa la ficha de la app (usa el link de
+   privacidad.html como política de privacidad) y envía a revisión.
+
+Si en algún paso de esto (sobre todo el 2 al 5, que son técnicos) algo
+no funciona, vuelve al chat con Claude y comparte el error exacto.
+
+
+
+=====================================================================
+COBROS (transferencia y tarjeta) Y DATOS LEGALES  —  LO QUE FALTA POR COMPLETAR
+=====================================================================
+
+TODO se completa en UN solo archivo: negocio.js
+
+1. DATOS DEL NEGOCIO (obligatorios antes de publicar)
+   titular, ruc, regimenTributario, direccion, correo,
+   plazoReembolso, envioDevolucion, zonasEntrega, costoEnvio.
+   Mientras estén vacíos, las páginas legales los muestran resaltados en
+   amarillo como "[completar: ...]". Abre la consola del navegador (F12): también
+   avisa qué falta.
+
+2. CUENTAS BANCARIAS (para transferencias)
+   En negocio.js > bancos: completa tipoCuenta, numeroCuenta, titular e
+   identificacion de cada banco que SÍ tengas. Un banco aparece en el pago solo si
+   tiene numeroCuenta. Usa una cuenta exclusiva del negocio.
+
+3. TARJETA (PayPhone)
+   El sitio NO procesa tarjetas. El cliente pide el link por WhatsApp y tú lo creas
+   en tu app de PayPhone con el total exacto. Debes abrir tu cuenta de comercio en
+   PayPhone y revisar sus comisiones y requisitos en payphone.app.
+   NUNCA pongas tokens o claves de PayPhone en el código: este sitio es público.
+
+4. REGLAS DE LA BASE DE DATOS (obligatorio)
+   Reemplaza TODAS las reglas de Firestore por las de reglas-firestore.txt y
+   sigue la guía de pruebas que está al final de ese archivo.
+
+5. SEGURIDAD EN GOOGLE CLOUD / FIREBASE / CLOUDINARY (solo tú puedes hacerlo)
+   - Google Cloud Console > Credenciales > tu clave de API del navegador >
+     "Restricciones de sitios web": permite solo bisuteriasayka.netlify.app
+     (y tu dominio propio si lo compras).
+   - Firebase > Authentication > Configuración: activa la protección contra
+     enumeración de correos y define una política de contraseñas.
+   - Cloudinary > Settings > Upload > tu preset "ayka-productos": limita formatos
+     (jpg, png, webp), tamaño máximo y carpeta. Sin esto cualquiera que conozca el
+     nombre del preset podría subir archivos a tu cuenta.
+
+6. ARCHIVOS QUE YA NO SE USAN (bórralos de la carpeta antes de publicar)
+   productos.js, personalizados.js, decoracion.js (datos de ejemplo viejos) y
+   images/logo-ayka.png. Ya nada los usa.
+
+7. CABECERAS DE SEGURIDAD
+   El archivo "_headers" (sin extensión) debe ir dentro de la carpeta que arrastras
+   a Netlify Drop. La política de contenido está en modo "solo reportar": después de
+   probar el sitio, si la consola (F12) no muestra avisos "Content-Security-Policy",
+   cambia "Content-Security-Policy-Report-Only" por "Content-Security-Policy".
+
+8. REVISIÓN HUMANA
+   Antes de publicar, que un abogado revise privacidad.html, terminos.html,
+   cookies.html y reembolsos.html. Son una base sólida, pero no sustituyen
+   asesoría legal.

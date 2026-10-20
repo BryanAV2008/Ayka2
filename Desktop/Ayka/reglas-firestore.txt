@@ -1,0 +1,109 @@
+Reglas de seguridad de Firestore para Bisuterías Ayka
+======================================================
+
+CÓMO USAR ESTO:
+1. Ve a console.firebase.google.com > tu proyecto (ayka-bisuterias)
+2. Menú izquierdo > Firestore Database > pestaña "Reglas" (Rules)
+3. Borra lo que haya y pega exactamente el bloque de abajo
+4. Clic en "Publicar" (Publish)
+
+Sin este paso, cualquier persona con conocimientos técnicos podría
+leer o modificar tu base de datos directamente, sin pasar por tu
+página. El diseño (botones ocultos, etc.) NO es suficiente protección
+por sí solo.
+
+------------------------------------------------------------
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function esAdminODueno() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.token.email)) &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.token.email)).data.rol in ['owner', 'admin'];
+    }
+
+    function esOwner() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.token.email)) &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.token.email)).data.rol == 'owner';
+    }
+
+    function esElCliente(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // Un producto solo se guarda si sus datos tienen sentido:
+    // nombre con texto, foto alojada en Cloudinary por HTTPS, precio y stock numéricos.
+    function productoValido(d) {
+      return d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 120
+        && d.imagen is string && d.imagen.matches('^https://res\\.cloudinary\\.com/.*')
+        && d.apartado in ['coleccion', 'personalizados', 'decoracion']
+        && (!('precio' in d) || (d.precio is number && d.precio >= 0 && d.precio <= 100000))
+        && (!('stock' in d) || (d.stock is number && d.stock >= 0 && d.stock <= 100000));
+    }
+
+    // Los productos los puede VER cualquier visitante de la tienda.
+    // Solo un admin o el owner puede crearlos, editarlos o borrarlos.
+    match /productos/{id} {
+      allow read: if true;
+      allow create: if esAdminODueno() && productoValido(request.resource.data);
+      allow delete: if esAdminODueno();
+      allow update: if
+        (esAdminODueno() && productoValido(request.resource.data))
+        // Cualquier visitante puede sumar EXACTAMENTE 1 a "cotizados" (al pedir por WhatsApp),
+        // y nada más. No puede poner un número cualquiera.
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cotizados'])
+            && request.resource.data.cotizados == resource.data.get('cotizados', 0) + 1);
+    }
+
+    // La lista de quién es owner/admin: solo el Owner puede modificarla.
+    match /usuarios/{correo} {
+      allow read: if esAdminODueno();
+      allow write: if esOwner();
+    }
+
+    // Cada cliente solo puede leer, modificar y BORRAR sus propios datos
+    // (derecho de acceso, rectificación y eliminación).
+    match /clientes/{uid} {
+      allow read, delete: if esElCliente(uid);
+      allow create, update: if esElCliente(uid)
+        && request.resource.data.keys().hasOnly(['nombre', 'telefono', 'correo', 'creado', 'carrito', 'aceptacion'])
+        && (!('carrito' in request.resource.data)
+            || (request.resource.data.carrito is list && request.resource.data.carrito.size() <= 100));
+
+      match /favoritos/{productoId} {
+        allow read, write: if esElCliente(uid);
+      }
+
+      // El historial no se puede editar, pero el cliente sí puede borrarlo.
+      match /pedidos/{pedidoId} {
+        allow read, create, delete: if esElCliente(uid);
+        allow update: if false;
+      }
+    }
+
+    // Todo lo que no esté permitido arriba queda denegado por defecto.
+  }
+}
+
+------------------------------------------------------------
+
+IMPORTANTE SOBRE LOS CORREOS:
+Estas reglas comparan el correo tal cual lo guarda Firebase Auth
+(usualmente en minúsculas). Para evitar problemas, siempre que
+crees un documento en la colección "usuarios", usa el correo
+completo en minúsculas como ID del documento (el panel ya lo hace
+así automáticamente).
+
+------------------------------------------------------------
+CÓMO PROBAR QUE LAS REGLAS NO ROMPIERON NADA (después de publicarlas):
+1. Entra como Owner al panel: agrega un producto con foto, cambia su precio y
+   su stock, y mira que se guarde.
+2. En la tienda (sin sesión): haz clic en "Pedir por WhatsApp" de un producto y
+   revisa en el panel que sus "cotizados" subieron en 1.
+3. Entra como cliente: marca un favorito, agrega algo al carrito, cierra sesión,
+   vuelve a entrar y revisa que sigan ahí.
+4. Si algo falla, abre la consola del navegador (F12): un error "permission-denied"
+   indica qué regla lo bloqueó. Compártelo para ajustarla.
