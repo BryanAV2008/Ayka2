@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crear cuenta · Bisuterías Ayka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/jpeg" href="images/logo-ayka.jpeg">
+</head>
+<body>
+
+<main class="pantalla-auth">
+  <div class="tarjeta-auth">
+    <a href="index.html" class="brand" style="justify-content:center; margin-bottom: 20px;">
+      <img src="images/logo-ayka.jpeg" alt="Bisuterías Ayka" class="brand-logo">
+    </a>
+    <h1>Crea tu cuenta</h1>
+    <p class="auth-subtitulo">Guarda tus favoritos y agiliza tus próximos pedidos.</p>
+
+    <form id="form-registro" class="form-auth">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" required autocomplete="name">
+
+      <label for="telefono">Teléfono / WhatsApp</label>
+      <input type="tel" id="telefono" required autocomplete="tel">
+
+      <label for="correo">Correo electrónico</label>
+      <input type="email" id="correo" required autocomplete="email">
+
+      <label for="contrasena">Contraseña</label>
+      <input type="password" id="contrasena" required minlength="6" autocomplete="new-password">
+
+      <div class="campo-consentimiento">
+        <input type="checkbox" id="mayor-edad" required>
+        <label for="mayor-edad">Declaro que tengo 18 años o más.</label>
+      </div>
+      <div class="campo-consentimiento">
+        <input type="checkbox" id="acepta-privacidad" required>
+        <label for="acepta-privacidad">Autorizo el tratamiento de mi nombre, teléfono y correo para gestionar mi cuenta, mis favoritos, mi carrito y mis pedidos, según la <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>. Puedo retirar mi consentimiento cuando quiera eliminando mi cuenta.</label>
+      </div>
+      <div class="campo-consentimiento">
+        <input type="checkbox" id="acepta-terminos" required>
+        <label for="acepta-terminos">Acepto los <a href="terminos.html" target="_blank" rel="noopener">Términos y condiciones</a>.</label>
+      </div>
+
+      <p id="mensaje-error" class="mensaje-error" role="alert"></p>
+
+      <button type="submit" class="btn btn-primario btn-ancho">Crear cuenta</button>
+    </form>
+
+    <p class="auth-subtitulo" style="margin-top:18px;">¿Ya tienes cuenta? <a href="ingresar.html">Inicia sesión</a></p>
+    <a href="index.html" class="volver-inicio">← Volver a la tienda</a>
+  </div>
+</main>
+
+<script src="negocio.js"></script>
+<script src="aviso-cookies.js"></script>
+<script type="module" src="registro.js"></script>
+</body>
+</html>
